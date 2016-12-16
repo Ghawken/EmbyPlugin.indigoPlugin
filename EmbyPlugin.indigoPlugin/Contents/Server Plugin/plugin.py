@@ -97,7 +97,7 @@ class Plugin(indigo.PluginBase):
             self.debugLog(u"deviceStartComm() method called.")
         indigo.server.log(u"Starting Emby device: " + dev.name)
         dev.stateListOrDisplayStateIdChanged()
-        dev.updateStateOnServer('deviceIsOnline', value=True, uiValue="Enabled")
+        dev.updateStateOnServer('deviceIsOnline', value=True, uiValue="Online")
 
     # Shut 'em down.
     def deviceStopComm(self, dev):
@@ -128,7 +128,7 @@ class Plugin(indigo.PluginBase):
 
                 for dev in indigo.devices.itervalues(filter="self"):
                     if self.debugLevel >= 2:
-                        self.debugLog(u"{0}:".format(dev.name))
+                        self.debugLog(u"MainLoop:  {0}:".format(dev.name))
                     # self.debugLog(len(dev.states))
                     self.refreshDataForDev(dev)
                 #else:
@@ -482,7 +482,7 @@ class Plugin(indigo.PluginBase):
                 #self.finalDict = self.rawData
 
                     # Put the final values into the device states - only if online
-                if dev.states['deviceIsOnline']:
+                if dev.states['deviceIsOnline']and dev.states['deviceTimestamp']>0:
                     self.parseStateValues(dev)
             else:
                 if self.debugLevel >= 2:

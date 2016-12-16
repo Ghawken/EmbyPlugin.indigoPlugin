@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>PluginVersion</key>
-	<string>0.0.2</string>
+	<string>0.0.5</string>
 	<key>ServerApiVersion</key>
 	<string>1.0.0</string>
 	<key>IwsApiVersion</key>
@@ -11,7 +11,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>Emby Plugin</string>
 	<key>CFBundleName</key>
-	<string>Emby Plugin</string>
+	<string>EmbyPlugin</string>
         <key>CFBundleIdentifier</key>
 	<string>com.GlennNZ.indigoplugin.EmbyPlugin</string>
 	<key>CFBundleVersion</key>
