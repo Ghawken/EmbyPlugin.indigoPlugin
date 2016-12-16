@@ -19,11 +19,11 @@
       </Field>
 
       <Field id="example1" type="label" fontSize="small" fontColor="black">
-        <Label>           URL:  http://192.168.1.206:8096</Label>
+        <Label>           URL:  192.168.1.206:8096</Label>
       </Field>
 
       <Field id="example2" type="label" fontSize="small" fontColor="black">
-        <Label>           URL:  http://192.168.1.1:8099</Label>
+        <Label>           URL:  192.168.1.1:8099</Label>
       </Field>
 
 
@@ -46,6 +46,12 @@
         <TriggerLabel>Device Last Updated</TriggerLabel>
         <ControlPageLabel>Device Last Updated</ControlPageLabel>
       </State>
+       
+       <State id="deviceTimestamp">
+        <ValueType>Number</ValueType>
+        <TriggerLabel>Device TimeStamp</TriggerLabel>
+        <ControlPageLabel>Device Last Updated TimeStamp</ControlPageLabel>
+      </State>     
       
       <State id="playbackTitle">
         <ValueType>String</ValueType>
@@ -82,6 +88,13 @@
         <TriggerLabel>Playback Position</TriggerLabel>
         <ControlPageLabel>Position of current playing item</ControlPageLabel>
       </State>
+      <State id="playbackPercentage">
+        <ValueType>Number</ValueType>
+        <TriggerLabel>Playback Percentage</TriggerLabel>
+        <ControlPageLabel>Playback Percentage</ControlPageLabel>
+      </State>
+      
+      
       <State id="playbackThumb">
         <ValueType>String</ValueType>
         <TriggerLabel>Playback URL for Thumbnail</TriggerLabel>

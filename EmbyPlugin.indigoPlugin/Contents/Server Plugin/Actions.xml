@@ -19,7 +19,11 @@
     <Name>Play</Name>
     <CallbackMethod>RemotePlay</CallbackMethod>
   </Action>
-  
+   
+   <Action id="RemotePlayPause" deviceFilter="self">
+    <Name>Play Pause Toggle</Name>
+    <CallbackMethod>RemotePlayPause</CallbackMethod>
+  </Action>
       <Action id="RemoteStop" deviceFilter="self">
     <Name>Stop</Name>
     <CallbackMethod>RemoteStop</CallbackMethod>

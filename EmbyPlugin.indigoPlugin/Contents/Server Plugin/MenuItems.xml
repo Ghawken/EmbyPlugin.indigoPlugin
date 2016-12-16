@@ -2,7 +2,7 @@
 <MenuItems>
   <MenuItem id="checkForUpdates">
     <Name>Check for Plugin Updates...</Name>
-    <CallbackMethod>checkforUpdates</CallbackMethod>
+    <CallbackMethod>checkForUpdates</CallbackMethod>
   </MenuItem>
   <MenuItem id="refreshData">
     <Name>Refresh Data Now...</Name>
