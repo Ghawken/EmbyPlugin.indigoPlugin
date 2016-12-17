@@ -164,7 +164,7 @@ class Plugin(indigo.PluginBase):
 
         error_msg_dict = indigo.Dict()
 
-        self.errorLog(u"Plugin configuration error: {0}".format(error))
+        #self.errorLog(u"Plugin configuration error: ")
 
         return True, valuesDict
 
