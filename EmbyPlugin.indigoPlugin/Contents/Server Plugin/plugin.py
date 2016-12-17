@@ -150,10 +150,10 @@ class Plugin(indigo.PluginBase):
         # See if there is a plugin update and whether the user wants to be notified.
         try:
             if self.configUpdaterForceUpdate:
-                self.updater.updatePlugin()
+                self.updatePlugin()
                 
             else:
-                self.updater.checkForUpdate()
+                self.checkForUpdates()
             self.sleep(1)
         except Exception as error:
             self.errorLog(u"Update checker error: {0}".format(error))
@@ -466,7 +466,7 @@ class Plugin(indigo.PluginBase):
                 if dev.states['deviceIsOnline']:
                     if self.debugLevel >= 2:
                         self.debugLog(u"Online: Refreshing device: {0}".format(dev.name))
-                        self.finalDict = self.getTheData(dev)
+                    self.finalDict = self.getTheData(dev)
 				
                 # Throw the data to the appropriate module to flatten it.
                 #dev.updateStateOnServer('deviceIsOnline', value=True, uiValue="Processing")
