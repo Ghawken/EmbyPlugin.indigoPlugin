@@ -7,7 +7,7 @@ Authors: See (repo)
 
 Works in combination with FrontViewAPI+ Emby Plugin to display info for
 single Emby client.
-Prefer this method to keep checking regularly
+
 """
 
 
@@ -47,7 +47,6 @@ class Plugin(indigo.PluginBase):
         self.debug = self.pluginPrefs.get('showDebugInfo', False)
         self.debugLevel = self.pluginPrefs.get('showDebugLevel', "1")
         self.deviceNeedsUpdated = ''
-        # self.prefPollInterval = int(self.pluginPrefs.get('configMenuPollInterval', "300"))
         self.prefServerTimeout = int(self.pluginPrefs.get('configMenuServerTimeout', "15"))
         self.updater = GitHubPluginUpdater(self)
         self.configUpdaterInterval = self.pluginPrefs.get('configUpdaterInterval', 24)
@@ -131,8 +130,7 @@ class Plugin(indigo.PluginBase):
                         self.debugLog(u"MainLoop:  {0}:".format(dev.name))
                     # self.debugLog(len(dev.states))
                     self.refreshDataForDev(dev)
-                #else:
-                    #self.fixErrorState(dev)
+
                 self.sleep(1)
 
         except self.StopThread:
@@ -151,7 +149,11 @@ class Plugin(indigo.PluginBase):
         
         # See if there is a plugin update and whether the user wants to be notified.
         try:
-            self.updater.checkForUpdate()
+            if self.configUpdaterForceUpdate:
+                self.updater.updatePlugin()
+                
+            else:
+                self.updater.checkForUpdate()
             self.sleep(1)
         except Exception as error:
             self.errorLog(u"Update checker error: {0}".format(error))
@@ -161,22 +163,8 @@ class Plugin(indigo.PluginBase):
             self.debugLog(u"validatePrefsConfigUi() method called.")
 
         error_msg_dict = indigo.Dict()
-        update_email = valuesDict['updaterEmail']
-        update_wanted = valuesDict['updaterEmailsEnabled']
 
-        # Test plugin update notification settings.
-        try:
-            if update_wanted and not update_email:
-                error_msg_dict['updaterEmail'] = u"If you want to be notified of updates, you must supply an email address."
-                return False, valuesDict, error_msg_dict
-
-            elif update_wanted and "@" not in update_email:
-                error_msg_dict['updaterEmail'] = u"Valid email addresses have at least one @ symbol in them (foo@bar.com)."
-
-                return False, valuesDict, error_msg_dict
-
-        except Exception as error:
-            self.errorLog(u"Plugin configuration error: {0}".format(error))
+        self.errorLog(u"Plugin configuration error: {0}".format(error))
 
         return True, valuesDict
 
@@ -192,10 +180,10 @@ class Plugin(indigo.PluginBase):
 
     def getTheData(self, dev):
         """
-        The getTheData() method is used to retrieve target data files.
+        The getTheData() method is used to retrieve FrontView API Client Data
         """
         if self.debugLevel >= 2:
-            self.debugLog(u"getTheData() method called.")
+            self.debugLog(u"getTheData FrontViewAPI method called.")
 
         #dev.updateStateOnServer('deviceIsOnline', value=True, uiValue="Download")
         try:
@@ -207,7 +195,7 @@ class Plugin(indigo.PluginBase):
             self.WaitInterval = 1
             dev.updateStateOnServer('deviceIsOnline', value=True, uiValue="Online")
             dev.setErrorStateOnServer(None)
-            dev.updateStateOnServer('deviceTimestamp', value=t.time())
+            #dev.updateStateOnServer('deviceTimestamp', value=t.time())
             return result
 
         except Exception as error:
@@ -217,7 +205,7 @@ class Plugin(indigo.PluginBase):
             if self.debugLevel >= 2:
                 self.debugLog(u"Device is offline. No data to return. ")
             dev.updateStateOnServer('deviceIsOnline', value=False, uiValue="Offline")
-            dev.updateStateOnServer('deviceTimestamp', value=t.time())
+            #dev.updateStateOnServer('deviceTimestamp', value=t.time())
             dev.setErrorStateOnServer(u'Offline')
             result = ""
             return result
@@ -410,7 +398,7 @@ class Plugin(indigo.PluginBase):
         dev.stateListOrDisplayStateIdChanged()
         update_time = t.strftime("%m/%d/%Y at %H:%M")
         dev.updateStateOnServer('deviceLastUpdated', value=update_time)
-        dev.updateStateOnServer('deviceTimestamp', value=t.time())
+        #dev.updateStateOnServer('deviceTimestamp', value=t.time())
             
     def refreshDataAction(self, valuesDict):
         """
@@ -459,10 +447,13 @@ class Plugin(indigo.PluginBase):
                 if self.debugLevel >= 2:
                     self.debugLog(u"   {0} is enabled.".format(dev.name))
                 
-                timeDifference = int(t.time()) - int(dev.states['deviceTimestamp'])
+                #timeDifference = int(t.time()) - int(dev.states['deviceTimestamp'])
+                # Change to using Last Updated setting - removing need for deviceTimestamp altogether
+                
+                timeDifference = int(t.time() - t.mktime(dev.lastChanged.timetuple()))
                 if self.debugLevel >= 1:
                     self.debugLog(dev.name+ u": Time Since Device Update = "+unicode(timeDifference))
-                
+                    #self.errorLog(unicode(dev.lastChanged))
                 # Get the data.
                 
                 #If device is offline wait for 60 seconds until rechecking
@@ -482,7 +473,7 @@ class Plugin(indigo.PluginBase):
                 #self.finalDict = self.rawData
 
                     # Put the final values into the device states - only if online
-                if dev.states['deviceIsOnline']and dev.states['deviceTimestamp']>0:
+                if dev.states['deviceIsOnline']:
                     self.parseStateValues(dev)
             else:
                 if self.debugLevel >= 2:

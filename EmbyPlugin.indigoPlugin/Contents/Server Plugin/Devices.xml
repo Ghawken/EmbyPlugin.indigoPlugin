@@ -5,11 +5,26 @@
     <Name>Emby Client Device</Name>
 
     <ConfigUI>
+      <Field id="label3" type="label" fontColor="black">
+        <Label>Emby Server and Port:</Label>
+      </Field>      
+            <Field id="label4" type="label" fontSize="small" fontColor="black">
+        <Label></Label>
+      </Field>
+      
+
+      
       <Field
         id="sourceXML" type="textfield">
         <Label>URL/Path:Port</Label>
       </Field>
-
+      <Field id="example3" type="label" fontSize="small" fontColor="black">
+        <Label> Must have installed Emby Server Plugin FrontView+API and setup correctly</Label>
+      </Field>
+            <Field id="example4" type="label" fontSize="small" fontColor="black">
+        <Label> Available in Emby Server Catalog</Label>
+      </Field>
+      
       <Field id="label0" type="label" fontSize="small" fontColor="black">
         <Label></Label>
       </Field>
@@ -46,12 +61,6 @@
         <TriggerLabel>Device Last Updated</TriggerLabel>
         <ControlPageLabel>Device Last Updated</ControlPageLabel>
       </State>
-       
-       <State id="deviceTimestamp">
-        <ValueType>Number</ValueType>
-        <TriggerLabel>Device TimeStamp</TriggerLabel>
-        <ControlPageLabel>Device Last Updated TimeStamp</ControlPageLabel>
-      </State>     
       
       <State id="playbackTitle">
         <ValueType>String</ValueType>
