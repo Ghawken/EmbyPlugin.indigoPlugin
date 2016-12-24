@@ -186,7 +186,7 @@ class Plugin(indigo.PluginBase):
         # dev.updateStateOnServer('deviceIsOnline', value=True, uiValue="Download")
         try:
             url = 'http://' + dev.pluginProps['sourceXML'] + '/FrontView'
-            r = requests.get(url)
+            r = requests.get(url,timeout=5)
             result = r.json()
             if self.debugLevel >= 2:
                 self.debugLog(u"Result:" + unicode(result))
