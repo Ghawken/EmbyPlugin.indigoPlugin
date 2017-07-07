@@ -125,7 +125,7 @@ class Plugin(indigo.PluginBase):
                     self.debugLog(u" ")
 
                 for dev in indigo.devices.itervalues(filter="self"):
-                    if self.debugLevel >= 2:
+                    if self.debugLevel >= 2 and self.debug:
                         self.debugLog(u"MainLoop:  {0}:".format(dev.name))
                     # self.debugLog(len(dev.states))
                     self.refreshDataForDev(dev)
@@ -180,7 +180,7 @@ class Plugin(indigo.PluginBase):
         """
         The getTheData() method is used to retrieve FrontView API Client Data
         """
-        if self.debugLevel >= 2:
+        if self.debugLevel >= 2 and self.debug:
             self.debugLog(u"getTheData FrontViewAPI method called.")
 
         # dev.updateStateOnServer('deviceIsOnline', value=True, uiValue="Download")
@@ -188,7 +188,7 @@ class Plugin(indigo.PluginBase):
             url = 'http://' + dev.pluginProps['sourceXML'] + '/FrontView'
             r = requests.get(url,timeout=5)
             result = r.json()
-            if self.debugLevel >= 2:
+            if self.debugLevel >= 2 and self.debug:
                 self.debugLog(u"Result:" + unicode(result))
             self.WaitInterval = 1
             dev.updateStateOnServer('deviceIsOnline', value=True, uiValue="Online")
@@ -200,7 +200,7 @@ class Plugin(indigo.PluginBase):
 
             indigo.server.log(u"Error connecting to Device:" + dev.name)
             self.WaitInterval = 60
-            if self.debugLevel >= 2:
+            if self.debugLevel >= 2  and self.debug:
                 self.debugLog(u"Device is offline. No data to return. ")
             dev.updateStateOnServer('deviceIsOnline', value=False, uiValue="Offline")
             # dev.updateStateOnServer('deviceTimestamp', value=t.time())
@@ -279,7 +279,7 @@ class Plugin(indigo.PluginBase):
                 Thumbvalue = ""
                 Fanartvalue = ""
 
-            if self.debugLevel >= 2:
+            if self.debugLevel >= 2  and self.debug:
                 self.debugLog("Thumb Value:" + str(Thumbvalue))
                 self.debugLog("Thumb Current State:" + str(dev.states['playbackThumb']))
 
@@ -294,11 +294,11 @@ class Plugin(indigo.PluginBase):
                         "/Library/Application Support/Perceptive Automation/images/EmbyPlugin/Thumbnail_art.png", "wb")
                     localFile.write(fileObj.read())
                     localFile.close()
-                    if self.debugLevel >= 2:
+                    if self.debugLevel >= 2  and self.debug:
                         self.debugLog(u"----- New Thumbail file created -------")
                 else:
 
-                    if self.debugLevel >= 2:
+                    if self.debugLevel >= 2  and self.debug:
                         self.debugLog(u"Nothing is playing - Replacing Thumb Artwork Files")
                     shutil.copy2("embyBlankThumb.png",
                                  "/Library/Application Support/Perceptive Automation/images/EmbyPlugin/Thumbnail_art.png")
@@ -311,13 +311,13 @@ class Plugin(indigo.PluginBase):
                         "/Library/Application Support/Perceptive Automation/images/EmbyPlugin/Fanart_art.png", "wb")
                     localFile.write(fileObj.read())
                     localFile.close()
-                    if self.debugLevel >= 2:
+                    if self.debugLevel >= 2 and self.debug :
                         self.debugLog(u"------- New Fanart file created ------")
                 else:
                     # if nothing playing delete the fanart files (else will continue to show wrong images)
                     # but this option - gives no URL error
                     # need to copy or create a blank png file - use shcopy - done.
-                    if self.debugLevel >= 2:
+                    if self.debugLevel >= 2  and self.debug:
                         self.debugLog(u"Nothing is playing - Replacing Fanart Files")
                     shutil.copy2("embyBlankFanart.png",
                                  "/Library/Application Support/Perceptive Automation/images/EmbyPlugin/Fanart_art.png")
@@ -333,7 +333,7 @@ class Plugin(indigo.PluginBase):
         The parseStateValues() method walks through the dict and assigns the
         corresponding value to each device state.
         """
-        if self.debugLevel >= 2:
+        if self.debugLevel >= 2  and self.debug:
             self.debugLog(u"Saving Values method called.")
 
         if self.finalDict is not None:
@@ -349,20 +349,20 @@ class Plugin(indigo.PluginBase):
             dev.updateStateOnServer(u"playbackFilename", value=self.finalDict['Filename'])
 
             if self.finalDict['TimePosition'] == 0:
-                if self.debugLevel >= 2:
+                if self.debugLevel >= 2 and self.debug:
                     self.debugLog(u"Time Position Equals 0: Changing to 1.")
                 self.finalDict['TimePosition'] = 1
 
             if self.finalDict['Duration'] > 0:
                 duration_seconds = int(self.finalDict['Duration'] / 10000000.00)
             elif self.finalDict['Duration'] == 0:
-                if self.debugLevel >= 2:
+                if self.debugLevel >= 2 and self.debug:
                     self.debugLog(u"Duraton Position Equals 0: Changing to TimePosition.")
                 duration_seconds = int(self.finalDict['TimePosition'] / 10000000.00)
 
             if duration_seconds == 0:
                 duration_seconds = 1
-                if self.debugLevel >= 2:
+                if self.debugLevel >= 2 and self.debug:
                     self.debugLog(u"Duration_Seconds Equals 0: Changing to 1.")
 
             duration_time = datetime.timedelta(seconds=duration_seconds)
@@ -389,7 +389,7 @@ class Plugin(indigo.PluginBase):
                 dev.updateStateOnServer(u"playbackState", value=u"Playing")
                 dev.updateStateImageOnServer(indigo.kStateImageSel.AvPlaying)
         elif dev.states['playbackFilename'] != "":
-            if self.debugLevel >= 2:
+            if self.debugLevel >= 2 and self.debug:
                 self.debugLog(u"Calling Setting States to nil.")
             self.setStatestonil(dev)
 
@@ -400,7 +400,7 @@ class Plugin(indigo.PluginBase):
         # dev.updateStateOnServer('deviceTimestamp', value=t.time())
 
     def setStatestonil(self, dev):
-        if self.debugLevel >= 2:
+        if self.debugLevel >= 2 and self.debug:
             self.debugLog(u'setStates to nil run')
         dev.updateStateOnServer(u"playbackState", value=u"False")
         dev.updateStateImageOnServer(indigo.kStateImageSel.AvStopped)
@@ -420,7 +420,7 @@ class Plugin(indigo.PluginBase):
         The refreshDataAction() method refreshes data for all devices based on
         a plugin menu call.
         """
-        if self.debugLevel >= 2:
+        if self.debugLevel >= 2 and self.debug:
             self.debugLog(u"refreshDataAction() method called.")
         self.refreshData()
         return True
@@ -430,13 +430,13 @@ class Plugin(indigo.PluginBase):
         The refreshData() method controls the updating of all plugin
         devices.
         """
-        if self.debugLevel >= 2:
+        if self.debugLevel >= 2 and self.debug:
             self.debugLog(u"refreshData() method called.")
 
         try:
             # Check to see if there have been any devices created.
             if indigo.devices.itervalues(filter="self"):
-                if self.debugLevel >= 2:
+                if self.debugLevel >= 2 and self.debug:
                     self.debugLog(u"Updating data...")
 
                 for dev in indigo.devices.itervalues(filter="self"):
@@ -455,31 +455,31 @@ class Plugin(indigo.PluginBase):
     def refreshDataForDev(self, dev):
 
         if dev.configured:
-            if self.debugLevel >= 2:
+            if self.debugLevel >= 2 and self.debug:
                 self.debugLog(u"Found configured device: {0}".format(dev.name))
 
             if dev.enabled:
-                if self.debugLevel >= 2:
+                if self.debugLevel >= 2 and self.debug:
                     self.debugLog(u"   {0} is enabled.".format(dev.name))
 
                 # timeDifference = int(t.time()) - int(dev.states['deviceTimestamp'])
                 # Change to using Last Updated setting - removing need for deviceTimestamp altogether
 
                 timeDifference = int(t.time() - t.mktime(dev.lastChanged.timetuple()))
-                if self.debugLevel >= 1:
+                if self.debugLevel >= 1 and self.debug:
                     self.debugLog(dev.name + u": Time Since Device Update = " + unicode(timeDifference))
                     # self.errorLog(unicode(dev.lastChanged))
                 # Get the data.
 
                 # If device is offline wait for 60 seconds until rechecking
                 if dev.states['deviceIsOnline'] == False and timeDifference >= 60:
-                    if self.debugLevel >= 2:
+                    if self.debugLevel >= 2 and self.debug:
                         self.debugLog(u"Offline: Refreshing device: {0}".format(dev.name))
                     self.finalDict = self.getTheData(dev)
 
                 # if device online normal time
                 if dev.states['deviceIsOnline']:
-                    if self.debugLevel >= 2:
+                    if self.debugLevel >= 2 and self.debug:
                         self.debugLog(u"Online: Refreshing device: {0}".format(dev.name))
                     self.finalDict = self.getTheData(dev)
 
@@ -491,7 +491,7 @@ class Plugin(indigo.PluginBase):
                 if dev.states['deviceIsOnline']:
                     self.parseStateValues(dev)
             else:
-                if self.debugLevel >= 2:
+                if self.debugLevel >= 2 and self.debug:
                     self.debugLog(u"    Disabled: {0}".format(dev.name))
 
     def refreshDataForDevAction(self, valuesDict):
@@ -499,7 +499,7 @@ class Plugin(indigo.PluginBase):
         The refreshDataForDevAction() method refreshes data for a selected device based on
         a plugin menu call.
         """
-        if self.debugLevel >= 2:
+        if self.debugLevel >= 2 and self.debug:
             self.debugLog(u"refreshDataForDevAction() method called.")
 
         dev = indigo.devices[valuesDict.deviceId]
