@@ -108,7 +108,12 @@
         <TriggerLabel>Playback Percentage</TriggerLabel>
         <ControlPageLabel>Playback Percentage</ControlPageLabel>
       </State>
-      
+
+        <State id="playbackLogo">
+        <ValueType>String</ValueType>
+        <TriggerLabel>Playback URL for Thumbnail</TriggerLabel>
+        <ControlPageLabel>Thumbnail URL</ControlPageLabel>
+      </State>
       
       <State id="playbackThumb">
         <ValueType>String</ValueType>

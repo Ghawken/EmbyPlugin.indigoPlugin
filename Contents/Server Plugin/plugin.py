@@ -96,6 +96,7 @@ class Plugin(indigo.PluginBase):
         indigo.server.log(u"Starting Emby device: " + dev.name)
         dev.stateListOrDisplayStateIdChanged()
         dev.updateStateOnServer('deviceIsOnline', value=True, uiValue="Online")
+        self.setStatestonil(dev)
 
     # Shut 'em down.
     def deviceStopComm(self, dev):
@@ -272,17 +273,21 @@ class Plugin(indigo.PluginBase):
         try:
             if self.finalDict['IsPlaying']:
                 Thumbvalue = "http://" + dev.pluginProps['sourceXML'] + "/Items/" + self.finalDict[
-                    'BackdropItemId'] + "/Images/Primary"
+                    'PrimaryItemId'] + "/Images/Primary"
                 Fanartvalue = "http://" + dev.pluginProps['sourceXML'] + "/Items/" + self.finalDict[
-                    'BackdropItemId'] + "/Images/Backdrop"
+                    'PrimaryItemId'] + "/Images/Backdrop"
+                Logovalue = "http://" + dev.pluginProps['sourceXML'] + "/Items/" + self.finalDict[
+                    'PrimaryItemId'] + "/Images/Logo"
             else:
                 Thumbvalue = ""
                 Fanartvalue = ""
+                Logovalue = ""
 
-            if self.debugLevel >= 2  and self.debug:
+            if self.debugLevel >= 2 and self.debug:
                 self.debugLog("Thumb Value:" + str(Thumbvalue))
                 self.debugLog("Thumb Current State:" + str(dev.states['playbackThumb']))
-
+                self.debugLog("Logo Value:" + str(Logovalue))
+                self.debugLog("Logo Current State:" + str(dev.states['playbackLogo']))
             # Check if Thumbvalue changed and make new file
 
             if str(Thumbvalue) != str(dev.states['playbackThumb']):
@@ -294,16 +299,17 @@ class Plugin(indigo.PluginBase):
                         "/Library/Application Support/Perceptive Automation/images/EmbyPlugin/Thumbnail_art.png", "wb")
                     localFile.write(fileObj.read())
                     localFile.close()
-                    if self.debugLevel >= 2  and self.debug:
+                    if self.debugLevel >= 2 and self.debug:
                         self.debugLog(u"----- New Thumbail file created -------")
                 else:
 
-                    if self.debugLevel >= 2  and self.debug:
+                    if self.debugLevel >= 2 and self.debug:
                         self.debugLog(u"Nothing is playing - Replacing Thumb Artwork Files")
                     shutil.copy2("embyBlankThumb.png",
                                  "/Library/Application Support/Perceptive Automation/images/EmbyPlugin/Thumbnail_art.png")
 
             if Fanartvalue != dev.states['playbackFanart']:
+
                 if self.finalDict['IsPlaying']:
                     reqObj = urllib2.Request(Fanartvalue)
                     fileObj = urllib2.urlopen(reqObj)
@@ -324,6 +330,27 @@ class Plugin(indigo.PluginBase):
                 # hutil.copy2("blank_art.jpg","/Library/Application Support/Perceptive Automation/images/EmbyPlugin/Thumbnail_art.png")
                 # os.remove("/Library/Application Support/Perceptive Automation/images/EmbyPlugin/Thumbnail_art.png")
                 # os.remove("/Library/Application Support/Perceptive Automation/images/EmbyPlugin/Fanart_art.png")
+
+
+            if str(Logovalue) != str(dev.states['playbackLogo']):
+                try:
+                    if self.finalDict['IsPlaying']:
+                        reqObj = urllib2.Request(Logovalue)
+                        fileObj = urllib2.urlopen(reqObj)
+                        localFile = open(
+                            "/Library/Application Support/Perceptive Automation/images/EmbyPlugin/Logo_art.png", "wb")
+                        localFile.write(fileObj.read())
+                        localFile.close()
+                        if self.debugLevel >= 2 and self.debug:
+                            self.debugLog(u"----- New Logo file created -------")
+                    else:
+                        if self.debugLevel >= 2 and self.debug:
+                            self.debugLog(u"Nothing is playing - Replacing Logo Artwork Files")
+                        shutil.copy2("embyBlankLogo.png",
+                                     "/Library/Application Support/Perceptive Automation/images/EmbyPlugin/Logo_art.png")
+                except:
+                    if self.debug:
+                        self.debugLog(u'Error within Logo - likely no such file')
         except:
             self.debugLog(u"Error within Process Artwork")
         return
@@ -377,11 +404,13 @@ class Plugin(indigo.PluginBase):
             dev.updateStateOnServer(u'playbackPercentage', value=percentage)
             dev.updateStateOnServer(u"playbackThumb",
                                     value="http://" + dev.pluginProps['sourceXML'] + "/Items/" + self.finalDict[
-                                        'BackdropItemId'] + "/Images/Primary")
+                                        'PrimaryItemId'] + "/Images/Primary")
             dev.updateStateOnServer(u"playbackFanart",
                                     value="http://" + dev.pluginProps['sourceXML'] + "/Items/" + self.finalDict[
-                                        'BackdropItemId'] + "/Images/Backdrop")
-
+                                        'PrimaryItemId'] + "/Images/Backdrop")
+            dev.updateStateOnServer(u"playbackLogo",
+                                    value="http://" + dev.pluginProps['sourceXML'] + "/Items/" + self.finalDict[
+                                        'PrimaryItemId'] + "/Images/Logo")
             if self.finalDict['IsPaused']:
                 dev.updateStateOnServer(u"playbackState", value=u"Paused")
                 dev.updateStateImageOnServer(indigo.kStateImageSel.AvPaused)
@@ -406,6 +435,7 @@ class Plugin(indigo.PluginBase):
         dev.updateStateImageOnServer(indigo.kStateImageSel.AvStopped)
         dev.updateStateOnServer(u"playbackThumb", value="")
         dev.updateStateOnServer(u"playbackFanart", value="")
+        dev.updateStateOnServer(u"playbackLogo", value="")
         dev.updateStateOnServer(u"playbackTitle", value="")
         dev.updateStateOnServer(u"playbackFilename", value="")
         dev.updateStateOnServer(u"playbackMediatype", value="")
@@ -507,19 +537,6 @@ class Plugin(indigo.PluginBase):
         self.refreshDataForDev(dev)
         return True
 
-    def stopSleep(self, start_sleep):
-        """
-        The stopSleep() method accounts for changes to the user upload interval
-        preference. The plugin checks every 2 seconds to see if the sleep
-        interval should be updated.
-        """
-        try:
-            total_sleep = float(self.pluginPrefs.get('configMenuUploadInterval', 300))
-        except:
-            total_sleep = iTimer  # TODO: Note variable iTimer is an unresolved reference.
-        if t.time() - start_sleep > total_sleep:
-            return True
-        return False
 
     def toggleDebugEnabled(self):
         """
