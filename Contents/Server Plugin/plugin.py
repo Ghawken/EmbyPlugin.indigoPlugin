@@ -11,13 +11,14 @@ single Emby client.
 """
 
 import datetime
-import simplejson
+#import simplejson
 import time as t
 import requests
-import urllib2
+import urllib.request
 import os
 import shutil
-from ghpu import GitHubPluginUpdater
+import sys
+import logging
 
 try:
     import indigo
@@ -47,7 +48,6 @@ class Plugin(indigo.PluginBase):
         self.debugLevel = self.pluginPrefs.get('showDebugLevel', "1")
         self.deviceNeedsUpdated = ''
         self.prefServerTimeout = int(self.pluginPrefs.get('configMenuServerTimeout', "15"))
-        self.updater = GitHubPluginUpdater(self)
         self.configUpdaterInterval = self.pluginPrefs.get('configUpdaterInterval', 24)
         self.configUpdaterForceUpdate = self.pluginPrefs.get('configUpdaterForceUpdate', False)
         self.WaitInterval = 1
@@ -61,6 +61,18 @@ class Plugin(indigo.PluginBase):
                 self.pluginPrefs['showDebugLevel'] = 2
             else:
                 self.pluginPrefs['showDebugLevel'] = 1
+
+        self.logger.info(u"")
+
+        self.logger.info("{0:=^130}".format(" Initializing New Plugin Session "))
+        self.logger.info("{0:<30} {1}".format("Plugin name:", pluginDisplayName))
+        self.logger.info("{0:<30} {1}".format("Plugin version:", pluginVersion))
+        self.logger.info("{0:<30} {1}".format("Plugin ID:", pluginId))
+        self.logger.info("{0:<30} {1}".format("Indigo version:", indigo.server.version))
+        self.logger.info("{0:<30} {1}".format("Python version:", sys.version.replace('\n', '')))
+        self.logger.info("{0:<30} {1}".format("Python Directory:", sys.prefix.replace('\n', '')))
+        self.logger.info("")
+        self.logger.info("{0:=^130}".format(" End of Initializing "))
 
     def __del__(self):
         if self.debugLevel >= 2:
@@ -105,16 +117,6 @@ class Plugin(indigo.PluginBase):
         indigo.server.log(u"Stopping Emby device: " + dev.name)
         dev.updateStateOnServer('deviceIsOnline', value=False, uiValue="Disabled")
 
-    def forceUpdate(self):
-        self.updater.update(currentVersion='0.0.0')
-
-    def checkForUpdates(self):
-        if self.updater.checkForUpdate() == False:
-            indigo.server.log(u"No Updates are Available")
-
-    def updatePlugin(self):
-        self.updater.update()
-
     def runConcurrentThread(self):
         if os.path.exists('/Library/Application Support/Perceptive Automation/images/EmbyPlugin') == 0:
             os.makedirs('/Library/Application Support/Perceptive Automation/images/EmbyPlugin')
@@ -125,7 +127,7 @@ class Plugin(indigo.PluginBase):
                 if self.debugLevel >= 2:
                     self.debugLog(u" ")
 
-                for dev in indigo.devices.itervalues(filter="self"):
+                for dev in indigo.devices.iter(filter="self"):
                     if self.debugLevel >= 2 and self.debug:
                         self.debugLog(u"MainLoop:  {0}:".format(dev.name))
                     # self.debugLog(len(dev.states))
@@ -149,11 +151,6 @@ class Plugin(indigo.PluginBase):
 
         # See if there is a plugin update and whether the user wants to be notified.
         try:
-            if self.configUpdaterForceUpdate:
-                self.updatePlugin()
-
-            else:
-                self.checkForUpdates()
             self.sleep(1)
         except Exception as error:
             self.errorLog(u"Update checker error: {0}".format(error))
@@ -190,7 +187,7 @@ class Plugin(indigo.PluginBase):
             r = requests.get(url,timeout=5)
             result = r.json()
             if self.debugLevel >= 2 and self.debug:
-                self.debugLog(u"Result:" + unicode(result))
+                self.debugLog(u"Result:" + str(result))
             self.WaitInterval = 1
             dev.updateStateOnServer('deviceIsOnline', value=True, uiValue="Online")
             dev.setErrorStateOnServer(None)
@@ -214,18 +211,18 @@ class Plugin(indigo.PluginBase):
             url = 'http://' + dev.pluginProps['sourceXML'] + '/FrontView/Play/' + PlayAction
             r = requests.post(url)
         except Exception as error:
-            self.errorLog(u"Error RemoteCall:" + unicode(error))
+            self.errorLog(u"Error RemoteCall:" + str(error))
             return
 
     def RemotePlay(self, pluginAction, dev):
         if self.debugLevel >= 2:
-            self.debugLog(u"Action Called: " + unicode(pluginAction))
+            self.debugLog(u"Action Called: " + str(pluginAction))
         self.remoteCall(pluginAction, dev, "Unpause")
         return
 
     def RemotePlayPause(self, pluginAction, dev):
         if self.debugLevel >= 2:
-            self.debugLog(u"Action Called: " + unicode(pluginAction))
+            self.debugLog(u"Action Called: " + str(pluginAction))
 
         if dev.states['playbackState'] == "Playing":
             self.remoteCall(pluginAction, dev, "Pause")
@@ -235,37 +232,37 @@ class Plugin(indigo.PluginBase):
 
     def RemotePause(self, pluginAction, dev):
         if self.debugLevel >= 2:
-            self.debugLog(u"Action Called: " + unicode(pluginAction))
+            self.debugLog(u"Action Called: " + str(pluginAction))
         self.remoteCall(pluginAction, dev, "Pause")
         return
 
     def RemoteFastForward(self, pluginAction, dev):
         if self.debugLevel >= 2:
-            self.debugLog(u"Action Called: " + unicode(pluginAction))
+            self.debugLog(u"Action Called: " + str(pluginAction))
         self.remoteCall(pluginAction, dev, "FastForward")
         return
 
     def RemoteRewind(self, pluginAction, dev):
         if self.debugLevel >= 2:
-            self.debugLog(u"Action Called: " + unicode(pluginAction))
+            self.debugLog(u"Action Called: " + str(pluginAction))
         self.remoteCall(pluginAction, dev, "Rewind")
         return
 
     def RemoteStop(self, pluginAction, dev):
         if self.debugLevel >= 2:
-            self.debugLog(u"Action Called: " + unicode(pluginAction))
+            self.debugLog(u"Action Called: " + str(pluginAction))
         self.remoteCall(pluginAction, dev, "Stop")
         return
 
     def RemoteNextTrack(self, pluginAction, dev):
         if self.debugLevel >= 2:
-            self.debugLog(u"Action Called: " + unicode(pluginAction))
+            self.debugLog(u"Action Called: " + str(pluginAction))
         self.remoteCall(pluginAction, dev, "NextTrack")
         return
 
     def RemotePreviousTrack(self, pluginAction, dev):
         if self.debugLevel >= 2:
-            self.debugLog(u"Action Called: " + unicode(pluginAction))
+            self.debugLog(u"Action Called: " + str(pluginAction))
         self.remoteCall(pluginAction, dev, "PreviousTrack")
         return
 
@@ -293,8 +290,8 @@ class Plugin(indigo.PluginBase):
             if str(Thumbvalue) != str(dev.states['playbackThumb']):
 
                 if self.finalDict['IsPlaying']:
-                    reqObj = urllib2.Request(Thumbvalue)
-                    fileObj = urllib2.urlopen(reqObj)
+                    reqObj = urllib.request.Request(Thumbvalue)
+                    fileObj = urllib.request.urlopen(reqObj)
                     localFile = open(
                         "/Library/Application Support/Perceptive Automation/images/EmbyPlugin/Thumbnail_art.png", "wb")
                     localFile.write(fileObj.read())
@@ -311,8 +308,8 @@ class Plugin(indigo.PluginBase):
             if Fanartvalue != dev.states['playbackFanart']:
 
                 if self.finalDict['IsPlaying']:
-                    reqObj = urllib2.Request(Fanartvalue)
-                    fileObj = urllib2.urlopen(reqObj)
+                    reqObj = urllib.request.Request(Fanartvalue)
+                    fileObj = urllib.request.urlopen(reqObj)
                     localFile = open(
                         "/Library/Application Support/Perceptive Automation/images/EmbyPlugin/Fanart_art.png", "wb")
                     localFile.write(fileObj.read())
@@ -335,8 +332,8 @@ class Plugin(indigo.PluginBase):
             if str(Logovalue) != str(dev.states['playbackLogo']):
                 try:
                     if self.finalDict['IsPlaying']:
-                        reqObj = urllib2.Request(Logovalue)
-                        fileObj = urllib2.urlopen(reqObj)
+                        reqObj = urllib.request.Request(Logovalue)
+                        fileObj = urllib.request.urlopen(reqObj)
                         localFile = open(
                             "/Library/Application Support/Perceptive Automation/images/EmbyPlugin/Logo_art.png", "wb")
                         localFile.write(fileObj.read())
@@ -465,11 +462,11 @@ class Plugin(indigo.PluginBase):
 
         try:
             # Check to see if there have been any devices created.
-            if indigo.devices.itervalues(filter="self"):
+            if indigo.devices.iter(filter="self"):
                 if self.debugLevel >= 2 and self.debug:
                     self.debugLog(u"Updating data...")
 
-                for dev in indigo.devices.itervalues(filter="self"):
+                for dev in indigo.devices.iter(filter="self"):
                     self.refreshDataForDev(dev)
 
             else:
@@ -479,7 +476,7 @@ class Plugin(indigo.PluginBase):
 
         except Exception as error:
             self.errorLog(u"Error refreshing devices. Please check settings.")
-            self.errorLog(unicode(error))
+            self.errorLog(str(error))
             return False
 
     def refreshDataForDev(self, dev):
@@ -497,8 +494,8 @@ class Plugin(indigo.PluginBase):
 
                 timeDifference = int(t.time() - t.mktime(dev.lastChanged.timetuple()))
                 if self.debugLevel >= 1 and self.debug:
-                    self.debugLog(dev.name + u": Time Since Device Update = " + unicode(timeDifference))
-                    # self.errorLog(unicode(dev.lastChanged))
+                    self.debugLog(dev.name + u": Time Since Device Update = " + str(timeDifference))
+                    # self.errorLog(str(dev.lastChanged))
                 # Get the data.
 
                 # If device is offline wait for 60 seconds until rechecking

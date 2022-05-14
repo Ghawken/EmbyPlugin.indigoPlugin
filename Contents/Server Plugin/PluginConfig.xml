@@ -9,19 +9,20 @@
   </Field>
 
 
-  <Field id="space1" type="label" fontColor="black">
+  <Field id="space1" type="label" hidden="true" fontColor="black">
+
     <Label>Check for Updates:</Label>
   </Field>
 
-  <Field id="space2" type="label" fontSize="small" fontColor="black">
+  <Field id="space2" type="label" hidden="true" fontSize="small" fontColor="black">
     <Label>The amount of time that the plugin will wait between checking for updated version</Label>
   </Field>
 
-  <Field id="configUpdaterInterval" type="textfield" defaultValue="24" tooltip="Select preference for how often updates will be checked">
+  <Field id="configUpdaterInterval" type="textfield" hidden="true" defaultValue="24" tooltip="Select preference for how often updates will be checked">
     <Label>Update Check Interval:(hours)</Label>
   </Field>
 
-  <Field id="configUpdaterForceUpdate" type="checkbox" tooltip="Will automatic install newer version at check.">
+  <Field id="configUpdaterForceUpdate" hidden="true" type="checkbox" tooltip="Will automatic install newer version at check.">
     <Label> Automatically install newer version at time of check</Label>
     <Description>Enable/Disable</Description>
   </Field>
