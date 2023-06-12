@@ -183,10 +183,11 @@ class Plugin(indigo.PluginBase):
 
         # dev.updateStateOnServer('deviceIsOnline', value=True, uiValue="Download")
         try:
-            url = 'http://' + dev.pluginProps['sourceXML'] + '/FrontView'
+            url = 'http://' + dev.pluginProps['sourceXML'] + '/FrontView?api_key='+str(dev.pluginProps['APIKEY'])
             r = requests.get(url,timeout=5)
             result = r.json()
             if self.debugLevel >= 2 and self.debug:
+                self.debugLog(f"URL: {url}")
                 self.debugLog(u"Result:" + str(result))
             self.WaitInterval = 1
             dev.updateStateOnServer('deviceIsOnline', value=True, uiValue="Online")
@@ -208,7 +209,7 @@ class Plugin(indigo.PluginBase):
 
     def remoteCall(self, pluginAction, dev, PlayAction):
         try:
-            url = 'http://' + dev.pluginProps['sourceXML'] + '/FrontView/Play/' + PlayAction
+            url = 'http://' + dev.pluginProps['sourceXML'] + '/FrontView/Play/' + PlayAction +'?api_key='+str(dev.pluginProps['APIkey'])
             r = requests.post(url)
         except Exception as error:
             self.errorLog(u"Error RemoteCall:" + str(error))

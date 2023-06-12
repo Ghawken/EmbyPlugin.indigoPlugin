@@ -11,9 +11,8 @@
             <Field id="label4" type="label" fontSize="small" fontColor="black">
         <Label></Label>
       </Field>
-      
+    <Field id="sepaaer422another" type="separator"/>
 
-      
       <Field
         id="sourceXML" type="textfield">
         <Label>URL/Path:Port</Label>
@@ -37,7 +36,7 @@
       <Field id="example2" type="label" fontSize="small" fontColor="black" alignText="right">
         <Label>URL:  192.168.1.1:8099</Label>
       </Field>
-
+    <Field id="sepaaer4another" type="separator"/>
       <Field id="label5" type="label" fontColor="black">
         <Label>Ignore Emby Theme files</Label>
       </Field>
@@ -49,7 +48,17 @@
       <Field id="example5" type="label" fontSize="small" fontColor="black" alignText="right">
         <Label>Ignores playback of Emby theme files both audio and video</Label>
       </Field>
-
+    <Field id="sepaaer42another" type="separator"/>
+        <Field
+        id="APIKEY" type="textfield">
+        <Label>APIKEY:</Label>
+      </Field>
+      <Field id="example2s3" type="label" fontSize="small" fontColor="black" alignText="right" >
+        <Label> (Must have installed Emby Server Plugin FrontView+API and setup correctly</Label>
+      </Field>
+            <Field id="example4as" type="label" fontSize="small" fontColor="black" alignText="right" >
+        <Label> Now needs an API KEY to be pasted here from your emby server</Label>
+      </Field>
 
 <!-- Substitution -->
 
