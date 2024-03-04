@@ -45,7 +45,7 @@ class Plugin(indigo.PluginBase):
         self.debugLog(u"Initializing Emby plugin.")
 
         self.debug = self.pluginPrefs.get('showDebugInfo', False)
-        self.debugLevel = self.pluginPrefs.get('showDebugLevel', "1")
+        self.debugLevel = int(self.pluginPrefs.get('showDebugLevel', "1"))
         self.deviceNeedsUpdated = ''
         self.prefServerTimeout = int(self.pluginPrefs.get('configMenuServerTimeout', "15"))
         self.configUpdaterInterval = self.pluginPrefs.get('configUpdaterInterval', 24)
